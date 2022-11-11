@@ -3,14 +3,6 @@ from typing import List, Dict, Any
 
 
 class Item:
-    uid: int = attrs.field(validator=attrs.validators.instance_of(int))
-    base_price: float = attrs.field(validator=attrs.validators.instance_of(float))
-    current_price: float = attrs.field(validator=attrs.validators.instance_of(float)) # if any campaign price
-    unit_price: float = attrs.field(validator=attrs.validators.instance_of(float))
-    current_unit_price: float = attrs.field(validator=attrs.validators.instance_of(float))
-    unit_price_label: float = attrs.field(validator=attrs.validators.instance_of(str))
-    discount: float = attrs.field(validator=attrs.validators.instance_of(float))
-
     @classmethod
     def new(cls, resp: Dict[str, Any]):
         raise NotImplementedError()
