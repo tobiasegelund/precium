@@ -37,10 +37,10 @@ class ItemStatic(Item):
 class ItemPrice(Item):
     uid: int = attrs.field(validator=attrs.validators.instance_of(int))
     base_price: float = attrs.field(validator=attrs.validators.instance_of(float))
+    unit_price: float = attrs.field(validator=attrs.validators.instance_of(float))
     current_price: float = attrs.field(
         validator=attrs.validators.instance_of(float)
     )  # if any campaign price
-    unit_price: float = attrs.field(validator=attrs.validators.instance_of(float))
     current_unit_price: float = attrs.field(
         validator=attrs.validators.instance_of(float)
     )
@@ -66,7 +66,7 @@ class NemligItemStatic(ItemStatic):
     def new(cls, resp: Dict[str, Any]):
         build_dict = {}
 
-        for key, kw in cls.kw_mapping:
+        for key, kw in cls.kw_mapping.items():
             val = resp.get(kw)
             build_dict.update({key: val})
 
@@ -89,7 +89,7 @@ class NemligItemPrice(ItemPrice):
 
         campaign = cls._unpack_campaign(resp=resp)
         if campaign is None:
-            # If no campaign - current price = base price
+            # If no campaign: current price = base price
             cls.kw_mapping.update(
                 {
                     "current_price": "Price",
@@ -97,7 +97,7 @@ class NemligItemPrice(ItemPrice):
                 }
             )
 
-        for key, kw in cls.kw_mapping:
+        for key, kw in cls.kw_mapping.items():
             val = resp.get(kw, None)
             if val is None:
                 campaign = cls._unpack_campaign(resp=resp)
@@ -105,10 +105,10 @@ class NemligItemPrice(ItemPrice):
                     val = campaign.get(kw, None)
             build_dict.update({key: val})
 
-        return cls(**resp)
+        return cls(**build_dict)
 
     @classmethod
-    def _unpack_campaign(cls, resp: Dict[str, Any]) -> Dict[str, Any]:
+    def _unpack_campaign(cls, resp: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return resp.get("Campaign", None)
 
 
