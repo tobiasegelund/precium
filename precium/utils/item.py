@@ -1,11 +1,15 @@
+import json
 import attrs
 from typing import List, Dict, Any
 
-
+@attrs.define(frozen=True)
 class Item:
     @classmethod
     def new(cls, resp: Dict[str, Any]):
         raise NotImplementedError()
+
+    def serialize(self):
+        return json.dumps(attrs.asdict(self))
 
 @attrs.define
 class ItemStatic(Item):
@@ -16,9 +20,7 @@ class ItemStatic(Item):
     description: str = attrs.field(default="", validator=attrs.validators.instance_of(str))
     brand: str = attrs.field(default="", validator=attrs.validators.instance_of(str))
     tags: List[str] = attrs.field(default=[])
-
-    def collect_static(self) -> None:
-        raise NotImplementedError()
+    unit_price_label: str = attrs.field(default="", validator=attrs.validators.instance_of(str))
 
 
 @attrs.define
@@ -28,15 +30,14 @@ class ItemPrice(Item):
     current_price: float = attrs.field(validator=attrs.validators.instance_of(float)) # if any campaign price
     unit_price: float = attrs.field(validator=attrs.validators.instance_of(float))
     current_unit_price: float = attrs.field(validator=attrs.validators.instance_of(float))
-    unit_price_label: float = attrs.field(validator=attrs.validators.instance_of(str))
     discount: float = attrs.field(validator=attrs.validators.instance_of(float))
 
-    def collect_price(self) -> None:
+    def _unpack_campaign(self, resp: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError()
 
 
 class NemligItemStatic(ItemStatic):
-    mapping = {
+    kw_mapping = {
         "uid": "Id",
         "description": "Text",
         "brand": "Brand",
@@ -44,39 +45,48 @@ class NemligItemStatic(ItemStatic):
         "tags": "Labels",
         "product_main_group": "ProductMainGroupName",
         "product_sub_group": "ProductSubGroupName",
+        "unit_price_label": "UnitPriceLabel",
     }
 
     @classmethod
     def new(cls, resp: Dict[str, Any]):
-        return cls(**resp)
+        build_dict = {}
 
-    def _unpack_campaign(self, resp: Dict[str, Any]) -> Dict[str, Any]:
-        return resp.get("Campaign", None)
+        for key, kw in cls.kw_mapping:
+            val = resp.get(kw)
+            build_dict.update({key: val})
 
-    def collect_static(self) -> None:
-        pass
+        return cls(**build_dict)
 
 
 class NemligItemPrice(ItemPrice):
-    mapping = {
+    kw_mapping = {
         "uid": "Id",
         "base_price": "Price",
         "unit_price": "UnitPriceCalc",
         "current_price": "CampaignPrice",
         "current_unit_price": "CampaignUnitPrice",
-        "unit_price_label": "UnitPriceLabel",
         "discount": "DiscountSavings"
     }
 
     @classmethod
     def new(cls, resp: Dict[str, Any]):
+        build_dict = {}
+
+        for key, kw in cls.kw_mapping:
+            val = resp.get(kw, None)
+            if val is None:
+                campaign = cls._unpack_campaign(resp=resp)
+                if campaign is None:
+                    pass
+            build_dict.update({key: val})
+
         return cls(**resp)
 
-    def _unpack_campaign(self, resp: Dict[str, Any]) -> Dict[str, Any]:
+    @classmethod
+    def _unpack_campaign(cls, resp: Dict[str, Any]) -> Dict[str, Any]:
         return resp.get("Campaign", None)
 
-    def collect_price(self) -> None:
-        pass
 
 class RemaItem(Item):
     pass
