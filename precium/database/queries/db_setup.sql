@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS prices;
 
 CREATE TABLE companies (
     company_id INT GENERATED ALWAYS AS IDENTITY,
-    company_name VARCHAR(50),
+    company_name VARCHAR(100),
     PRIMARY KEY (company_id)
 );
 
@@ -22,12 +22,12 @@ CREATE TABLE items (
 CREATE TABLE static (
     item_id INT,
     description VARCHAR,
-    brand VARCHAR(50),
-    category VARCHAR(50),
-    product_main_group VARCHAR(50),
-    product_sub_group VARCHAR(50),
-    tags VARCHAR(50),
-    unit_price_label VARCHAR(50),
+    brand VARCHAR(100),
+    category VARCHAR(100),
+    product_main_group VARCHAR(100),
+    product_sub_group VARCHAR(100),
+    tags VARCHAR,
+    unit_price_label VARCHAR(100),
     CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
 
