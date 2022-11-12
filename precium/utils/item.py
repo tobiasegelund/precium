@@ -2,6 +2,8 @@ import json
 import attrs
 from typing import List, Dict, Any, Optional
 
+from .company import CompanyNemlig
+
 
 @attrs.define(frozen=True)
 class Item:
@@ -44,45 +46,25 @@ class ItemPrice(Item):
     current_unit_price: float = attrs.field(
         validator=attrs.validators.instance_of(float)
     )
-    discount: float = attrs.field(default=0.0)
+    discount: Optional[float] = attrs.field(default=None)
 
     def _unpack_campaign(self, resp: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError()
 
 
-class NemligItemStatic(ItemStatic):
-    kw_mapping = {
-        "uid": "Id",
-        "description": "Text",
-        "brand": "Brand",
-        "category": "Category",
-        "tags": "Labels",
-        "product_main_group": "ProductMainGroupName",
-        "product_sub_group": "ProductSubGroupName",
-        "unit_price_label": "UnitPriceLabel",
-    }
-
+class NemligItemStatic(ItemStatic, CompanyNemlig):
     @classmethod
     def new(cls, resp: Dict[str, Any]):
         build_dict = {}
 
-        for key, kw in cls.kw_mapping.items():
+        for key, kw in cls.static_kw_mapping.items():
             val = resp.get(kw)
             build_dict.update({key: val})
 
         return cls(**build_dict)
 
 
-class NemligItemPrice(ItemPrice):
-    kw_mapping = {
-        "uid": "Id",
-        "base_price": "Price",
-        "unit_price": "UnitPriceCalc",
-        "current_price": "CampaignPrice",
-        "current_unit_price": "CampaignUnitPrice",
-        "discount": "DiscountSavings",
-    }
-
+class NemligItemPrice(ItemPrice, CompanyNemlig):
     @classmethod
     def new(cls, resp: Dict[str, Any]):
         build_dict = {}
@@ -90,14 +72,14 @@ class NemligItemPrice(ItemPrice):
         campaign = cls._unpack_campaign(resp=resp)
         if campaign is None:
             # If no campaign: current price = base price
-            cls.kw_mapping.update(
+            cls.prices_kw_mapping.update(
                 {
                     "current_price": "Price",
                     "current_unit_price": "UnitPriceCalc",
                 }
             )
 
-        for key, kw in cls.kw_mapping.items():
+        for key, kw in cls.prices_kw_mapping.items():
             val = resp.get(kw, None)
             if val is None:
                 campaign = cls._unpack_campaign(resp=resp)
