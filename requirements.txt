@@ -4,3 +4,4 @@ pytest
 # fastapi
 requests
 attrs
+aiohttp
