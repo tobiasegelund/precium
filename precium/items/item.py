@@ -91,11 +91,3 @@ class NemligItemPrice(ItemPrice, CompanyNemlig):
     @classmethod
     def _unpack_campaign(cls, resp: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return resp.get("Campaign", None)
-
-
-class RemaItem(Item):
-    pass
-
-
-class BilkaItem(Item):
-    pass

@@ -1,6 +1,6 @@
 from typing import List
 
-from precium.items import NemligItemStatic
+from precium.items.item import NemligItemStatic
 from precium.utils.asyncs import fetch_urls
 from precium.utils.env import load_env_api
 
