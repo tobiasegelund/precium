@@ -82,7 +82,6 @@ class NemligItemPrice(ItemPrice, CompanyNemlig):
         for key, kw in cls.prices_kw_mapping.items():
             val = resp.get(kw, None)
             if val is None:
-                campaign = cls._unpack_campaign(resp=resp)
                 if campaign is not None:
                     val = campaign.get(kw, None)
             build_dict.update({key: val})
