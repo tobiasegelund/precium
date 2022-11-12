@@ -1,4 +1,4 @@
-CREATE DATABASE precium;
+-- CREATE DATABASE precium;
 
 DROP TABLE IF EXISTS companies;
 DROP TABLE IF EXISTS items;
