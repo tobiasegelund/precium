@@ -16,7 +16,7 @@ def scrape_static(company: str, uid_interval: List[int]):
     """
     if (mask := len(uid_interval)) != 2:
         raise ValueError(
-            f"{mask} values entered in uid_interval. Only two allowed - a mininum and maximum value"
+            f"{mask} values entered in uid_interval. Only two values are allowed - a mininum and maximum value"
         )
     api = load_env_api(company=company)
     urls = list(api + str(uid) for uid in range(*uid_interval))
