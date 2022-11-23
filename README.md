@@ -1,4 +1,6 @@
 # precium
-Framework to scrape prices on grocery items of danish supermarkets
+Framework to scrape prices on grocery items of a danish supermarket
 
-Free to use. Though, you have to find the APIs yourself :-)
+Only created with learning purpose in mind.
+
+Free to use and expand. Though, you have to find the APIs yourself :-)

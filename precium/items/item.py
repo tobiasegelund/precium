@@ -17,7 +17,7 @@ class Item:
 
 @attrs.define
 class ItemStatic(Item):
-    uid: int = attrs.field(validator=attrs.validators.instance_of(int))
+    uid: int = attrs.field(converter=int)
     category: str = attrs.field(default="", validator=attrs.validators.instance_of(str))
     product_main_group: str = attrs.field(
         default="", validator=attrs.validators.instance_of(str)
@@ -37,15 +37,11 @@ class ItemStatic(Item):
 
 @attrs.define
 class ItemPrice(Item):
-    uid: int = attrs.field(validator=attrs.validators.instance_of(int))
-    base_price: float = attrs.field(validator=attrs.validators.instance_of(float))
-    unit_price: float = attrs.field(validator=attrs.validators.instance_of(float))
-    current_price: float = attrs.field(
-        validator=attrs.validators.instance_of(float)
-    )  # if any campaign price
-    current_unit_price: float = attrs.field(
-        validator=attrs.validators.instance_of(float)
-    )
+    uid: int = attrs.field(converter=int)
+    base_price: float = attrs.field(converter=float)
+    unit_price: float = attrs.field(converter=float)
+    current_price: float = attrs.field(converter=float)  # if any campaign price
+    current_unit_price: float = attrs.field(converter=float)
     discount: Optional[float] = attrs.field(default=None)
 
     def _unpack_campaign(self, resp: Dict[str, Any]) -> Dict[str, Any]:

@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 
 from precium.items.item import NemligItemStatic
@@ -21,4 +22,5 @@ def scrape_static(company: str, uid_interval: List[int]):
     api = load_env_api(company=company)
     urls = list(api + str(uid) for uid in range(*uid_interval))
 
-    return fetch_urls(urls=urls)
+    output = asyncio.run(fetch_urls(urls=urls))
+    return output
