@@ -1,7 +1,7 @@
 import pytest
 from attrs import asdict
 
-from precium.items.item import NemligItemStatic, NemligItemPrice
+from precium.entities.items import NemligItemStatic, NemligItemPrice
 
 
 def test_item_static_class():

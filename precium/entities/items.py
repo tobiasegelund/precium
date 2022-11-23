@@ -87,3 +87,21 @@ class NemligItemPrice(ItemPrice, CompanyNemlig):
     @classmethod
     def _unpack_campaign(cls, resp: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return resp.get("Campaign", None)
+
+
+def create_static_items(resp_data: List[Dict[str, Any]]):
+    l = list()
+    for resp in resp_data:
+        if resp is not None:
+            l.append(NemligItemStatic.new(**resp))
+
+    return l
+
+
+def create_price_items(resp_data: List[Dict[str, Any]]):
+    l = list()
+    for resp in resp_data:
+        if resp is not None:
+            l.append(NemligItemPrice.new(**resp))
+
+    return l
