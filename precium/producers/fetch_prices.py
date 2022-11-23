@@ -1,2 +1,2 @@
-from precium.items import create_price_items
-from precium.scrapers import scrape_price
+def scrape_price(uid: int, company: str):
+    pass
