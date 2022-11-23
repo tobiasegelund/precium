@@ -2,7 +2,7 @@ import json
 import attrs
 from typing import List, Dict, Any, Optional
 
-from .company import CompanyNemlig
+from .companies import CompanyNemlig
 
 
 @attrs.define(frozen=True)
