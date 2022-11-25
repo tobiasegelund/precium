@@ -4,22 +4,26 @@ from typing import List, Dict, Any, Optional, Union
 from aiohttp import ClientSession
 
 
-async def fetch_url(url: str, session: ClientSession) -> Optional[Dict[str, Any]]:
+async def get_data(url: str, session: ClientSession) -> Optional[Dict[str, Any]]:
     # logger.info(f"[Info] Fetch {str(url)}")
     response = await session.request(method="GET", url=url)
     if response.status != 200:
         return None
     text = await response.text()
-    # logger.info(f"[Info] {str(url)} responded with status code {response.status}")
+
     return json.loads(text)
 
 
-async def fetch_urls(urls: List[str]) -> List[Union[Dict[str, Any], None]]:
+async def send_data(data: Optional[Dict[str, Any]]):
+    pass
+
+
+async def get_and_send_data_async(urls: List[str]) -> None:
     """
     Usage:
-        output = asyncio.run(fetch_urls(urls=urls))
+        output = asyncio.run(get_api_data(urls=urls))
     """
+
     async with ClientSession() as session:
-        tasks = list(fetch_url(url=url, session=session) for url in urls)
-        data_dict = await asyncio.gather(*tasks)
-    return data_dict
+        tasks = list(get_data(url=url, session=session) for url in urls)
+        await asyncio.gather(*tasks)

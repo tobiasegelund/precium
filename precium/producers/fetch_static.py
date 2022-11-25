@@ -1,9 +1,21 @@
+import json
+import uuid
+import datetime
 import asyncio
 from typing import List
-from kafka.producer import KafkaProducer
 
-from precium.utils.asyncs import fetch_urls
+from kafka.producer import KafkaProducer
+from aiohttp import ClientSession
+
+from precium.utils.asyncs import get_and_send_data_async
 from precium.utils.env import load_env_api
+
+TOPIC = "static"
+
+producer = KafkaProducer(
+    value_serializer=lambda msg: json.dumps(msg).encode("utf-8"),
+    bootstrap_servers=["localhost:9092"],
+)
 
 
 def scrape_static(company: str, uid_interval: List[int]):
@@ -15,6 +27,7 @@ def scrape_static(company: str, uid_interval: List[int]):
         company, str: Company name
         uid_interval, List[int]: The defined minimum and maximum uid to scrape.
     """
+
     if (mask := len(uid_interval)) != 2:
         raise ValueError(
             f"{mask} values entered in uid_interval. Only two values are allowed - a mininum and maximum value"
@@ -22,7 +35,7 @@ def scrape_static(company: str, uid_interval: List[int]):
     api = load_env_api(company=company)
     urls = list(api + str(uid) for uid in range(*uid_interval))
 
-    output = asyncio.run(fetch_urls(urls=urls))
+    output = asyncio.run(get_and_send_data_async(urls=urls))
     return output
 
 
