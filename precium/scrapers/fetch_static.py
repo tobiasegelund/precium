@@ -11,9 +11,9 @@ API = load_env_api(company=Company.nemlig)
 
 
 def scrape_static(uid_range: List[int]) -> None:
-    """Scrape static data - It can be used as to search the number of uid a company has
+    """Scrape static of items
 
-    The uid_range allows to search in a different space in the future if new items have been added
+    The uid_range allows to search in a different space in the future, e.g. if new items are added
 
     Args:
         uid_range, List[int]: The defined minimum and maximum uid to scrape.

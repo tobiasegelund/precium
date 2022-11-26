@@ -1,5 +1,5 @@
 import os
-from precium.entities.companies import Company
+from .enums import Company
 
 
 def load_env_api(company: Company) -> str:
