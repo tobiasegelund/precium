@@ -1,3 +1,6 @@
+"""
+Async material used https://pawelmhm.github.io/asyncio/python/aiohttp/2016/04/22/asyncio-aiohttp.html
+"""
 import json
 import asyncio
 import uuid
@@ -28,14 +31,19 @@ async def send_event(payload: str, topic: str, producer: KafkaProducer) -> None:
     producer.send(topic, data)
 
 
-async def collect_data(
-    url: str, session: ClientSession, topic: str, producer: KafkaProducer
+async def bound_collect(
+    sem: asyncio.Semaphore,
+    url: str,
+    session: ClientSession,
+    topic: str,
+    producer: KafkaProducer,
 ):
-    payload = await get_event(url=url, session=session)
-    if payload is None:
-        return
+    async with sem:
+        payload = await get_event(url=url, session=session)
+        if payload is None:
+            return
 
-    await send_event(payload=payload, topic=topic, producer=producer)
+        await send_event(payload=payload, topic=topic, producer=producer)
 
 
 async def bulk_collect_data(urls: List[str], topic: str, producer) -> None:
@@ -43,12 +51,15 @@ async def bulk_collect_data(urls: List[str], topic: str, producer) -> None:
     Usage:
         output = asyncio.run(bulk_collect_data(urls=urls))
     """
-    sema = asyncio.BoundedSemaphore(5)
+    sem = asyncio.Semaphore(5)
 
     async with ClientSession() as session:
         tasks = list(
-            collect_data(url=url, session=session, topic=topic, producer=producer)
+            asyncio.ensure_future(
+                bound_collect(
+                    sem=sem, url=url, session=session, topic=topic, producer=producer
+                )
+            )
             for url in urls
         )
-        async with sema:
-            await asyncio.gather(*tasks)
+        await asyncio.gather(*tasks)
