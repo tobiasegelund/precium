@@ -2,7 +2,7 @@ import asyncio
 from typing import List
 
 from precium.producers import kafka_producer as producer
-from precium.entities.companies import Company
+from precium.utils.enums import Company
 from precium.utils.asyncs import bulk_collect
 from precium.utils.env import load_env_api
 
