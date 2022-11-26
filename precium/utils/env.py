@@ -1,12 +1,13 @@
 import os
+from precium.entities.companies import Company
 
 
-def load_env_api(company: str) -> str:
+def load_env_api(company: Company) -> str:
     """Load API defined as environmental variables"""
-    mapping = {"nemlig": "NEMLIG_API"}
+    mapping = {"nemlig.com": "NEMLIG_API"}
 
     try:
-        env_name = mapping.get(company)
+        env_name = mapping.get(company.value)
     except KeyError:
         raise ValueError(f"{company} not among the options {mapping.keys()}")
 

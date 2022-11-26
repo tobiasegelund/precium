@@ -1,3 +1,10 @@
+from enum import Enum
+
+
+class Company(Enum):
+    nemlig = "nemlig.com"
+
+
 class CompanyNemlig:
     COMPANY_NAME = "Nemlig.com"
 

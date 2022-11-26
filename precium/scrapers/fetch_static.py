@@ -2,19 +2,20 @@ import asyncio
 from typing import List
 
 from precium.producers import kafka_producer as producer
+from precium.entities.companies import Company
 from precium.utils.asyncs import bulk_collect
 from precium.utils.env import load_env_api
 
 TOPIC = "static"
+API = load_env_api(company=Company.nemlig)
 
 
-def scrape_static(company: str, uid_range: List[int]):
+def scrape_static(uid_range: List[int]) -> None:
     """Scrape static data - It can be used as to search the number of uid a company has
 
     The uid_range allows to search in a different space in the future if new items have been added
 
     Args:
-        company, str: Company name
         uid_range, List[int]: The defined minimum and maximum uid to scrape.
     """
 
@@ -22,18 +23,10 @@ def scrape_static(company: str, uid_range: List[int]):
         raise ValueError(
             f"{mask} values entered in uid_range. Only two values are allowed - a mininum and maximum value"
         )
-    api = load_env_api(company=company)
-    urls = list(api + str(uid) for uid in range(*uid_range))
+    urls = list(API + str(uid) for uid in range(*uid_range))
 
-    output = asyncio.run(bulk_collect(urls=urls, topic=TOPIC, producer=producer))
-    return output
-
-
-def main():
-    resp_data = scrape_static(company="nemlig", uid_range=[5012332, 5012340])
-    if resp_data is None:
-        raise ValueError()
+    asyncio.run(bulk_collect(urls=urls, topic=TOPIC, producer=producer))
 
 
 if __name__ == "__main__":
-    main()
+    scrape_static(uid_range=[5012332, 5012340])
