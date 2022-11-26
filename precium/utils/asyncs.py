@@ -46,10 +46,10 @@ async def bound_collect(
         await send_event(payload=payload, topic=topic, producer=producer)
 
 
-async def bulk_collect_data(urls: List[str], topic: str, producer) -> None:
+async def bulk_collect(urls: List[str], topic: str, producer: KafkaProducer) -> None:
     """
     Usage:
-        output = asyncio.run(bulk_collect_data(urls=urls))
+        output = asyncio.run(bulk_collect(urls=urls))
     """
     sem = asyncio.Semaphore(5)
 

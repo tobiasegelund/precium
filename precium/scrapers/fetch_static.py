@@ -2,7 +2,7 @@ import asyncio
 from typing import List
 
 from precium.producers import kafka_producer as producer
-from precium.utils.asyncs import bulk_collect_data
+from precium.utils.asyncs import bulk_collect
 from precium.utils.env import load_env_api
 
 TOPIC = "static"
@@ -25,7 +25,7 @@ def scrape_static(company: str, uid_range: List[int]):
     api = load_env_api(company=company)
     urls = list(api + str(uid) for uid in range(*uid_range))
 
-    output = asyncio.run(bulk_collect_data(urls=urls, topic=TOPIC, producer=producer))
+    output = asyncio.run(bulk_collect(urls=urls, topic=TOPIC, producer=producer))
     return output
 
 
