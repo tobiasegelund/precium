@@ -6,4 +6,5 @@ requests
 attrs
 aiohttp
 kafka
+boto3
 # python-dotenv

@@ -1,21 +1,11 @@
-import json
-import uuid
-import datetime
 import asyncio
 from typing import List
 
-from kafka.producer import KafkaProducer
-from aiohttp import ClientSession
-
-from precium.utils.asyncs import get_and_send_data_async
+from precium.producers import kafka_producer as producer
+from precium.utils.asyncs import bulk_collect_data
 from precium.utils.env import load_env_api
 
 TOPIC = "static"
-
-producer = KafkaProducer(
-    value_serializer=lambda msg: json.dumps(msg).encode("utf-8"),
-    bootstrap_servers=["localhost:9092"],
-)
 
 
 def scrape_static(company: str, uid_interval: List[int]):
@@ -35,11 +25,8 @@ def scrape_static(company: str, uid_interval: List[int]):
     api = load_env_api(company=company)
     urls = list(api + str(uid) for uid in range(*uid_interval))
 
-    output = asyncio.run(get_and_send_data_async(urls=urls))
+    output = asyncio.run(bulk_collect_data(urls=urls, topic=TOPIC, producer=producer))
     return output
-
-
-# Send values with KafkaProducer
 
 
 def main():
