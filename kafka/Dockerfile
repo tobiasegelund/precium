@@ -52,7 +52,7 @@ RUN set -eux ; \
     rm -rf /tmp2 ; \
     rm -rf /var/lib/apt/lists/*
 
-COPY overrides /opt/overrides
+# COPY overrides /opt/overrides
 
 VOLUME ["/kafka"]
 
