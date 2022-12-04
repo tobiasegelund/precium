@@ -16,7 +16,11 @@ from precium.entities.enums import Company
 def collect_uid(data: Dict[str, Any], company: Company):
     mapping = {Company.nemlig: "Id"}
 
-    kw = mapping.get(company)
+    kw = mapping.get(company, None)
+    if kw is None:
+        raise ValueError(
+            f"{company} does not have any realted key-word mapping to find uid.."
+        )
     uid = data.get(kw)
     if uid is None:
         raise ValueError(f"{kw} doesn't exists in payload. Something has changed..")
