@@ -1,7 +1,7 @@
 import asyncio
 from typing import List
 
-from precium.producers import kafka_producer as producer
+from precium.brokers import kafka_producer as producer
 from precium.entities.enums import Company
 from precium.utils.asyncs import bulk_collect
 from precium.utils.env import load_env_api
@@ -17,6 +17,9 @@ def scrape_static(uid_range: List[int]) -> None:
 
     Args:
         uid_range, List[int]: The defined minimum and maximum uid to scrape.
+
+    Returns:
+        None - Everything is sent to Kafka brokers or
     """
 
     if (mask := len(uid_range)) != 2:
