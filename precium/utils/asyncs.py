@@ -5,7 +5,7 @@ import json
 import asyncio
 import uuid
 import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from aiohttp import ClientSession
 
 from kafka.producer import KafkaProducer
@@ -13,15 +13,15 @@ from kafka.producer import KafkaProducer
 from precium.entities.enums import Company
 
 
-def convert_to_json(payload: str, company: Company) -> tuple:
-    data = json.loads(payload)
-
+def collect_uid(data: Dict[str, Any], company: Company):
     mapping = {Company.nemlig: "Id"}
 
     kw = mapping.get(company)
     uid = data.get(kw)
+    if uid is None:
+        raise ValueError(f"{kw} doesn't exists in payload. Something has changed..")
 
-    return uid, json.loads(payload)
+    return uid
 
 
 async def get_event(url: str, session: ClientSession) -> Optional[str]:
@@ -37,7 +37,8 @@ async def get_event(url: str, session: ClientSession) -> Optional[str]:
 async def send_event(
     payload: str, topic: str, company: Company, producer: KafkaProducer
 ) -> None:
-    uid, data = convert_to_json(payload, company=company)
+    data = json.loads(payload)
+    uid = collect_uid(data, company=company)
     data = {
         "event_id": str(uuid.uuid4()),
         "event_datetime": datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),
