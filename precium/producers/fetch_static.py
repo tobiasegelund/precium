@@ -20,7 +20,7 @@ def scrape_static(uid_range: List[int]) -> None:
         uid_range, List[int]: The defined minimum and maximum uid to scrape.
 
     Returns:
-        None - Everything is sent to Kafka brokers or
+        None - Everything is sent to brokers
     """
 
     if (mask := len(uid_range)) != 2:

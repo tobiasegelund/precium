@@ -52,8 +52,8 @@ async def send_event(
     }
     if not debug:
         producer.send(topic, data)
-    else:
-        print(data)
+
+    print(data)
 
 
 async def bound_collect(

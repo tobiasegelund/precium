@@ -1,5 +1,5 @@
 """
-Inspired from https://docs.aws.amazon.com/kinesisanalytics/latest/java/gs-python-createapp.html
+Inspired by https://docs.aws.amazon.com/kinesisanalytics/latest/java/gs-python-createapp.html
 """
 
 import boto3
