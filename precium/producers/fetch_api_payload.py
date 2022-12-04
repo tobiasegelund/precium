@@ -17,7 +17,7 @@ def fetch_api_payload(uid_range: List[int]) -> None:
     The uid_range allows to search in a different space in the future, e.g. if new items are added
 
     Args:
-        uid_range, List[int]: The defined minimum and maximum uid to scrape.
+        uid_range, List[int]: The defined range (minimum and maximum) uids to scrape.
 
     Returns:
         None - Everything is sent to brokers
