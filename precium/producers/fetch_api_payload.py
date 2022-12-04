@@ -1,14 +1,29 @@
+import os
 import asyncio
 from typing import List
 
 from precium.brokers import kafka_producer as producer
 from precium.entities.enums import Company
-from precium.utils.asyncs import bulk_collect
-from precium.utils.env import load_env_api
+from .asyncs import bulk_collect
 
 COMPANY = Company.nemlig
-API = load_env_api(company=COMPANY)
 DEBUG = True
+
+
+def load_env_api(company: Company) -> str:
+    """Load API defined as environmental variables"""
+    mapping = {Company.nemlig: "NEMLIG_API"}
+
+    try:
+        env_name = mapping.get(company)
+    except KeyError:
+        raise ValueError(f"{company} not among the options {mapping.keys()}")
+
+    api = os.environ[env_name]
+
+    if api == "":
+        raise ValueError(f"Environmental variable {env_name} is undefined")
+    return api
 
 
 def fetch_api_payload(uid_range: List[int]) -> None:
@@ -22,12 +37,13 @@ def fetch_api_payload(uid_range: List[int]) -> None:
     Returns:
         None - Everything is sent to brokers
     """
+    api = load_env_api(company=COMPANY)
 
     if (mask := len(uid_range)) != 2:
         raise ValueError(
             f"{mask} values entered in uid_range. Only two values are allowed - a mininum and maximum value"
         )
-    urls = list(API + str(uid) for uid in range(*uid_range))
+    urls = list(api + str(uid) for uid in range(*uid_range))
 
     asyncio.run(
         bulk_collect(urls=urls, company=COMPANY, producer=producer, debug=DEBUG)
