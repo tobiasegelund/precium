@@ -7,7 +7,8 @@ from precium.utils.asyncs import bulk_collect
 from precium.utils.env import load_env_api
 
 TOPIC = "static"
-API = load_env_api(company=Company.nemlig)
+COMPANY = Company.nemlig
+API = load_env_api(company=COMPANY)
 
 
 def scrape_static(uid_range: List[int]) -> None:
@@ -28,7 +29,9 @@ def scrape_static(uid_range: List[int]) -> None:
         )
     urls = list(API + str(uid) for uid in range(*uid_range))
 
-    asyncio.run(bulk_collect(urls=urls, topic=TOPIC, producer=producer))
+    asyncio.run(
+        bulk_collect(urls=urls, topic=TOPIC, company=COMPANY, producer=producer)
+    )
 
 
 if __name__ == "__main__":

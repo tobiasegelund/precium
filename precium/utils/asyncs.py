@@ -35,7 +35,7 @@ async def get_event(url: str, session: ClientSession) -> Optional[str]:
 
 
 async def send_event(
-    payload: str, topic: str, company: Company, producer: KafkaProducer
+    payload: str, topic: str, company: Company, producer: KafkaProducer, debug: bool
 ) -> None:
     data = json.loads(payload)
     uid = collect_uid(data, company=company)
@@ -46,8 +46,10 @@ async def send_event(
         "company": company.value,
         "payload": data,
     }
-
-    producer.send(topic, data)
+    if not debug:
+        producer.send(topic, data)
+    else:
+        print(data)
 
 
 async def bound_collect(
@@ -57,6 +59,7 @@ async def bound_collect(
     topic: str,
     company: Company,
     producer: KafkaProducer,
+    debug: bool,
 ):
     async with sem:
         payload = await get_event(url=url, session=session)
@@ -64,12 +67,20 @@ async def bound_collect(
             return
 
         await send_event(
-            payload=payload, topic=topic, company=company, producer=producer
+            payload=payload,
+            topic=topic,
+            company=company,
+            producer=producer,
+            debug=debug,
         )
 
 
 async def bulk_collect(
-    urls: List[str], topic: str, company: Company, producer: KafkaProducer
+    urls: List[str],
+    topic: str,
+    company: Company,
+    producer: KafkaProducer,
+    debug: bool = True,
 ) -> None:
     """
     Usage:
@@ -87,6 +98,7 @@ async def bulk_collect(
                     topic=topic,
                     company=company,
                     producer=producer,
+                    debug=debug,
                 )
             )
             for url in urls
