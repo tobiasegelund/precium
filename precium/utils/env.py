@@ -4,10 +4,10 @@ from ..entities.enums import Company
 
 def load_env_api(company: Company) -> str:
     """Load API defined as environmental variables"""
-    mapping = {"nemlig.com": "NEMLIG_API"}
+    mapping = {Company.nemlig: "NEMLIG_API"}
 
     try:
-        env_name = mapping.get(company.value)
+        env_name = mapping.get(company)
     except KeyError:
         raise ValueError(f"{company} not among the options {mapping.keys()}")
 

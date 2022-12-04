@@ -10,6 +10,19 @@ from aiohttp import ClientSession
 
 from kafka.producer import KafkaProducer
 
+from precium.entities.enums import Company
+
+
+def convert_to_json(payload: str, company: Company) -> tuple:
+    data = json.loads(payload)
+
+    mapping = {Company.nemlig: "Id"}
+
+    kw = mapping.get(company)
+    uid = data.get(kw)
+
+    return uid, json.loads(payload)
+
 
 async def get_event(url: str, session: ClientSession) -> Optional[str]:
     # logger.info(f"[Info] Fetch {str(url)}")
@@ -21,11 +34,16 @@ async def get_event(url: str, session: ClientSession) -> Optional[str]:
     return payload
 
 
-async def send_event(payload: str, topic: str, producer: KafkaProducer) -> None:
+async def send_event(
+    payload: str, topic: str, company: Company, producer: KafkaProducer
+) -> None:
+    uid, data = convert_to_json(payload, company=company)
     data = {
         "event_id": str(uuid.uuid4()),
         "event_datetime": datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),
-        "payload": json.loads(payload),
+        "uid": uid,
+        "company": company.value,
+        "payload": data,
     }
 
     producer.send(topic, data)
@@ -36,6 +54,7 @@ async def bound_collect(
     url: str,
     session: ClientSession,
     topic: str,
+    company: Company,
     producer: KafkaProducer,
 ):
     async with sem:
@@ -43,10 +62,14 @@ async def bound_collect(
         if payload is None:
             return
 
-        await send_event(payload=payload, topic=topic, producer=producer)
+        await send_event(
+            payload=payload, topic=topic, company=company, producer=producer
+        )
 
 
-async def bulk_collect(urls: List[str], topic: str, producer: KafkaProducer) -> None:
+async def bulk_collect(
+    urls: List[str], topic: str, company: Company, producer: KafkaProducer
+) -> None:
     """
     Usage:
         output = asyncio.run(bulk_collect(urls=urls))
@@ -57,7 +80,12 @@ async def bulk_collect(urls: List[str], topic: str, producer: KafkaProducer) -> 
         tasks = list(
             asyncio.ensure_future(
                 bound_collect(
-                    sem=sem, url=url, session=session, topic=topic, producer=producer
+                    sem=sem,
+                    url=url,
+                    session=session,
+                    topic=topic,
+                    company=company,
+                    producer=producer,
                 )
             )
             for url in urls
