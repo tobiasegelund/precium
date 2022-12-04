@@ -2,8 +2,6 @@ import json
 import attrs
 from typing import List, Dict, Any, Optional
 
-from .companies import CompanyNemlig
-
 
 @attrs.define(frozen=True)
 class Item:
@@ -48,7 +46,18 @@ class ItemPrice(Item):
         raise NotImplementedError()
 
 
-class NemligItemStatic(ItemStatic, CompanyNemlig):
+class NemligItemStatic(ItemStatic):
+    static_kw_mapping = {
+        "uid": "Id",
+        "description": "Text",
+        "brand": "Brand",
+        "category": "Category",
+        "tags": "Labels",
+        "product_main_group": "ProductMainGroupName",
+        "product_sub_group": "ProductSubGroupName",
+        "unit_price_label": "UnitPriceLabel",
+    }
+
     @classmethod
     def new(cls, resp: Dict[str, Any]):
         build_dict = {}
@@ -60,7 +69,16 @@ class NemligItemStatic(ItemStatic, CompanyNemlig):
         return cls(**build_dict)
 
 
-class NemligItemPrice(ItemPrice, CompanyNemlig):
+class NemligItemPrice(ItemPrice):
+    prices_kw_mapping = {
+        "uid": "Id",
+        "base_price": "Price",
+        "unit_price": "UnitPriceCalc",
+        "current_price": "CampaignPrice",
+        "current_unit_price": "CampaignUnitPrice",
+        "discount": "DiscountSavings",
+    }
+
     @classmethod
     def new(cls, resp: Dict[str, Any]):
         build_dict = {}

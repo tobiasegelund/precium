@@ -1,5 +1,5 @@
 import os
-from .enums import Company
+from ..entities.enums import Company
 
 
 def load_env_api(company: Company) -> str:
