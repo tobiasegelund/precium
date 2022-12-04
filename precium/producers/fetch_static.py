@@ -1,7 +1,7 @@
 import asyncio
 from typing import List
 
-from precium.brokers import kafka_producer as producer
+from precium.brokers import mock_kafka_producer as producer
 from precium.entities.enums import Company
 from precium.utils.asyncs import bulk_collect
 from precium.utils.env import load_env_api
@@ -9,7 +9,6 @@ from precium.utils.env import load_env_api
 TOPIC = "static"
 COMPANY = Company.nemlig
 API = load_env_api(company=COMPANY)
-
 
 def scrape_static(uid_range: List[int]) -> None:
     """Scrape static of items

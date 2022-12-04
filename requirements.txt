@@ -5,6 +5,6 @@ pytest
 requests
 attrs
 aiohttp
-kafka
+kafka-python
 boto3
 # python-dotenv
