@@ -1,16 +1,17 @@
 import asyncio
 from typing import List
 
-from precium.brokers import mock_kafka_producer as producer
+from precium.brokers import kafka_producer as producer
 from precium.entities.enums import Company
 from precium.utils.asyncs import bulk_collect
 from precium.utils.env import load_env_api
 
-TOPIC = "static"
 COMPANY = Company.nemlig
 API = load_env_api(company=COMPANY)
+DEBUG = True
 
-def scrape_static(uid_range: List[int]) -> None:
+
+def fetch_api_payload(uid_range: List[int]) -> None:
     """Scrape static of items
 
     The uid_range allows to search in a different space in the future, e.g. if new items are added
@@ -29,9 +30,9 @@ def scrape_static(uid_range: List[int]) -> None:
     urls = list(API + str(uid) for uid in range(*uid_range))
 
     asyncio.run(
-        bulk_collect(urls=urls, topic=TOPIC, company=COMPANY, producer=producer)
+        bulk_collect(urls=urls, company=COMPANY, producer=producer, debug=DEBUG)
     )
 
 
 if __name__ == "__main__":
-    scrape_static(uid_range=[5012332, 5012340])
+    fetch_api_payload(uid_range=[5012332, 5012340])

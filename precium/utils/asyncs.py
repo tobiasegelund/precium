@@ -39,7 +39,7 @@ async def get_event(url: str, session: ClientSession) -> Optional[str]:
 
 
 async def send_event(
-    payload: str, topic: str, company: Company, producer: KafkaProducer, debug: bool
+    payload: str, company: Company, producer: KafkaProducer, debug: bool
 ) -> None:
     data = json.loads(payload)
     uid = collect_uid(data, company=company)
@@ -47,11 +47,10 @@ async def send_event(
         "event_id": str(uuid.uuid4()),
         "event_datetime": datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"),
         "uid": uid,
-        "company": company.value,
         "payload": data,
     }
     if not debug:
-        producer.send(topic, data)
+        producer.send(company.name, data)  # company defines the Kafka topic
 
     print(data)
 
@@ -60,7 +59,6 @@ async def bound_collect(
     sem: asyncio.Semaphore,
     url: str,
     session: ClientSession,
-    topic: str,
     company: Company,
     producer: KafkaProducer,
     debug: bool,
@@ -72,7 +70,6 @@ async def bound_collect(
 
         await send_event(
             payload=payload,
-            topic=topic,
             company=company,
             producer=producer,
             debug=debug,
@@ -81,7 +78,6 @@ async def bound_collect(
 
 async def bulk_collect(
     urls: List[str],
-    topic: str,
     company: Company,
     producer: KafkaProducer,
     debug: bool = True,
@@ -99,7 +95,6 @@ async def bulk_collect(
                     sem=sem,
                     url=url,
                     session=session,
-                    topic=topic,
                     company=company,
                     producer=producer,
                     debug=debug,
