@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.10.8-slim-buster
 
 COPY ./precium .
 COPY ./requirements.txt .
